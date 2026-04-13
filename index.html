@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<title>Checklist Intubation SMUR</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#1a1a2e;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;color:#fff;min-height:100vh}
+
+/* HEADER */
+.hdr{background:#1a1a2e;padding:env(safe-area-inset-top,10px) 12px 7px;position:sticky;top:0;z-index:100;border-bottom:1px solid rgba(255,255,255,0.06)}
+.hdr-row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.hdr-left h1{font-size:12px;font-weight:700;color:#fff;white-space:nowrap}
+.hdr-left p{color:rgba(255,255,255,0.45);font-size:11px;margin-top:1px}
+.pbar{height:2px;background:rgba(255,255,255,0.1);margin:5px 0 0;border-radius:2px}
+.pfill{height:100%;border-radius:2px;transition:width 0.4s}
+
+/* POIDS BOX */
+.poids-box{background:linear-gradient(135deg,#e65c00,#f9a825);border-radius:12px;padding:7px 11px;display:flex;align-items:center;gap:7px;cursor:pointer;flex-shrink:0}
+.poids-box-val{font-size:18px;font-weight:800;color:#fff;min-width:38px;text-align:center}
+.poids-box-lbl{font-size:10px;color:rgba(255,255,255,0.8);font-weight:600;line-height:1.2}
+.poids-box-mic{font-size:16px;cursor:pointer;padding:2px}
+.poids-box-mic.listening{animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+
+/* POIDS MODAL */
+.poids-modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:500;display:none;align-items:flex-end;justify-content:center}
+.poids-modal-bg.show{display:flex}
+.poids-modal{background:#1e2040;border-radius:22px 22px 0 0;padding:20px 20px 36px;width:100%;max-width:420px}
+.poids-modal h2{font-size:15px;font-weight:700;margin-bottom:14px;color:#fff}
+.poids-modal-row{display:flex;gap:10px;align-items:center;margin-bottom:10px}
+.pv{background:rgba(0,0,0,0.3);border:2px solid #f9a825;border-radius:11px;padding:10px 12px;font-size:22px;font-weight:700;color:#f9a825;width:110px;outline:none;text-align:center;-webkit-appearance:none}
+.pv::placeholder{color:rgba(255,255,255,0.2);font-size:14px;font-weight:400}
+.mic-btn{width:44px;height:44px;border-radius:50%;border:2px solid rgba(249,168,37,0.4);background:rgba(249,168,37,0.1);display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;transition:all 0.2s;-webkit-tap-highlight-color:transparent}
+.mic-btn.listening{background:rgba(239,68,68,0.2);border-color:#ef4444;animation:pulse 1s infinite}
+.poids-close{margin-top:6px;width:100%;padding:12px;background:rgba(249,168,37,0.15);border:1px solid rgba(249,168,37,0.3);border-radius:12px;color:#f9a825;font-size:14px;font-weight:600;cursor:pointer}
+
+/* TABS */
+.tabs{display:flex;gap:5px;padding:6px 12px;overflow-x:auto;scrollbar-width:none;background:#1a1a2e;position:sticky;top:0;z-index:99}
+.tabs::-webkit-scrollbar{display:none}
+.tab{padding:7px 11px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap;border:none;transition:all 0.3s;display:flex;align-items:center;gap:3px;-webkit-tap-highlight-color:transparent}
+
+.cnt{padding:10px 12px 100px}
+.card{border-radius:16px;padding:14px;margin-bottom:10px}
+.stitle{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:12px}
+.ci{display:flex;align-items:flex-start;gap:11px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.07);cursor:pointer;-webkit-tap-highlight-color:transparent}
+.ci:last-child{border-bottom:none;padding-bottom:0}
+.cb{width:24px;height:24px;min-width:24px;border-radius:7px;border:2px solid;display:flex;align-items:center;justify-content:center;transition:all 0.2s}
+.cb.on{border-color:transparent!important}
+.ck{width:12px;height:8px;border-left:2.5px solid #fff;border-bottom:2.5px solid #fff;transform:rotate(-45deg) translateY(-2px);display:none}
+.cb.on .ck{display:block}
+.it{font-size:14px;line-height:1.4;flex:1;padding-top:2px}
+.it.dn{text-decoration:line-through;opacity:0.4}
+.ok{background:rgba(34,197,94,0.15);border:1px solid rgba(34,197,94,0.3);border-radius:12px;padding:11px 14px;margin-bottom:10px;display:none;align-items:center;gap:10px}
+.ok.show{display:flex}
+
+/* sonde N° input inline */
+.sonde-row{display:flex;align-items:center;gap:8px;margin-top:6px}
+.sonde-input{background:rgba(0,0,0,0.3);border:1.5px solid rgba(255,255,255,0.15);border-radius:8px;padding:5px 10px;font-size:13px;color:#fff;width:80px;outline:none;text-align:center;-webkit-appearance:none}
+.sonde-input::placeholder{color:rgba(255,255,255,0.25);font-size:11px}
+.sonde-input:focus{border-color:rgba(255,255,255,0.4)}
+
+/* dual checkbox (dispo / préparée) */
+.dual-row{display:flex;align-items:center;gap:0;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.07)}
+.dual-row:last-child{border-bottom:none;padding-bottom:0}
+.dual-label{font-size:14px;flex:1;line-height:1.35;padding-right:6px}
+.dual-checks{display:flex;gap:10px;flex-shrink:0}
+.dual-check-item{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.dual-check-lbl{font-size:9px;font-weight:600;color:rgba(255,255,255,0.4);letter-spacing:0.3px;text-transform:uppercase}
+.dual-cb{width:22px;height:22px;border-radius:6px;border:2px solid;display:flex;align-items:center;justify-content:center;transition:all 0.2s}
+.dual-cb.on{border-color:transparent!important}
+.dual-cb .ck{display:none}
+.dual-cb.on .ck{display:block}
+
+/* PLAN */
+.plan-block{border-radius:14px;margin-bottom:8px;overflow:hidden}
+.plan-header{display:flex;align-items:center;justify-content:space-between;padding:11px 13px;-webkit-tap-highlight-color:transparent}
+.plan-badge{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0}
+.plan-title{font-size:14px;font-weight:600}
+.plan-sub{font-size:12px;opacity:0.6;margin-top:1px}
+.plan-chk{width:22px;height:22px;min-width:22px;border-radius:6px;border:2px solid rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;transition:all 0.2s}
+.plan-chk.on{border-color:transparent}
+.plan-chk .ck{display:none}
+.plan-chk.on .ck{display:block}
+.plan-opts{padding:0 13px 11px;display:flex;flex-direction:column;gap:7px}
+.plan-opt{border-radius:10px;border:1.5px solid rgba(255,255,255,0.1);padding:9px 11px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:9px;-webkit-tap-highlight-color:transparent}
+.rdot{width:16px;height:16px;min-width:16px;border-radius:50%;border:2px solid rgba(255,255,255,0.25);display:flex;align-items:center;justify-content:center}
+.rdot.sel{border-color:inherit}
+.rdot.sel::after{content:'';width:8px;height:8px;border-radius:50%;background:currentColor;display:block}
+.size-badge{margin-left:auto;font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px;white-space:nowrap}
+.trigger{display:flex;align-items:flex-start;gap:8px;margin:4px 0;padding:9px 12px;border-radius:11px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08)}
+.trigger-icon{font-size:13px;margin-top:1px;flex-shrink:0}
+.trigger-text{font-size:12px;color:rgba(255,255,255,0.5);line-height:1.4}
+.trigger-input{font-size:12px;color:rgba(255,255,255,0.7);background:transparent;border:none;outline:none;width:100%;resize:none;font-family:inherit;line-height:1.4;margin-top:2px}
+.trigger-input::placeholder{color:rgba(255,255,255,0.22)}
+
+/* DRUGS */
+.dopt{border-radius:12px;border:1.5px solid rgba(255,255,255,0.1);padding:11px 13px;cursor:pointer;margin-bottom:9px;transition:all 0.2s;-webkit-tap-highlight-color:transparent}
+.dopt:last-child{margin-bottom:0}
+.dopt.sel{border-color:#10b981;background:rgba(16,185,129,0.12)}
+.doh{display:flex;align-items:center;justify-content:space-between}
+.dn2{font-size:13px;font-weight:600;color:rgba(255,255,255,0.92)}
+.dtag{font-size:11px;font-weight:600;padding:3px 8px;border-radius:6px;background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.6)}
+.dopt.sel .dtag{background:rgba(16,185,129,0.2);color:#6ee7b7}
+.dcalc{margin-top:9px;padding:9px 11px;background:rgba(0,0,0,0.25);border-radius:9px}
+.dcl{color:rgba(255,255,255,0.4);font-size:11px;margin-bottom:2px}
+.dcv{color:#34d399;font-size:20px;font-weight:700}
+.dcr{color:#6ee7b7;font-size:20px;font-weight:700}
+.dcu{color:rgba(255,255,255,0.45);font-size:12px;font-weight:400}
+.drdot{width:18px;height:18px;min-width:18px;border-radius:50%;border:2px solid rgba(255,255,255,0.25);display:flex;align-items:center;justify-content:center}
+.drdot.sel{border-color:#10b981}
+.drdot.sel::after{content:'';width:9px;height:9px;border-radius:50%;background:#10b981;display:block}
+
+.reset-btn{position:fixed;bottom:max(20px,env(safe-area-inset-bottom));right:14px;background:#2a2a4a;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.55);padding:9px 15px;border-radius:18px;font-size:12px;font-weight:600;cursor:pointer;z-index:200;-webkit-tap-highlight-color:transparent}
+
+@media(orientation:landscape){
+  .hdr{padding:4px 12px 4px}
+  .tabs{padding:4px 12px}
+  .tab{padding:5px 10px;font-size:10px}
+  .cnt{padding:6px 12px 50px}
+  .poids-box-val{font-size:15px}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-row">
+    <div class="hdr-left">
+      <h1>Check list d'intubation hors AC</h1>
+      <p id="pl">0 / 0 éléments validés</p>
+    </div>
+    <!-- POIDS BOX -->
+    <div class="poids-box" onclick="openPoids()">
+      <div>
+        <div class="poids-box-lbl">POIDS</div>
+        <div class="poids-box-val" id="poids-display">—</div>
+      </div>
+      <div>
+        <div class="poids-box-lbl">kg</div>
+        <div class="poids-box-mic" id="hdr-mic">🎤</div>
+      </div>
+    </div>
+  </div>
+  <div class="pbar"><div class="pfill" id="pf" style="width:0%"></div></div>
+</div>
+
+<!-- POIDS MODAL -->
+<div class="poids-modal-bg" id="poids-modal-bg" onclick="closePoids(event)">
+  <div class="poids-modal">
+    <h2>Poids du patient</h2>
+    <div class="poids-modal-row">
+      <input class="pv" type="number" inputmode="decimal" min="1" max="200" placeholder="— kg" id="poids-input"
+        oninput="setPoids(parseFloat(this.value)||0)"/>
+      <span style="color:rgba(255,255,255,.5);font-size:16px;font-weight:600">kg</span>
+      <button class="mic-btn" id="poids-mic" onclick="toggleListen()">🎤</button>
+    </div>
+    <div style="font-size:12px;color:rgba(255,255,255,.35);margin-bottom:10px" id="poids-hint">Saisir ou dicter le poids</div>
+    <button class="poids-close" onclick="closePoids()">Valider</button>
+  </div>
+</div>
+
+<div class="tabs" id="tb"></div>
+<div class="cnt" id="mc"></div>
+<button class="reset-btn" onclick="resetAll()">🔄 Réinit.</button>
+
+<script>
+// ---- SECTIONS (order: Patient / Plan / Equipe / Materiel / Drogues) ----
+const S=[
+  {id:"patient",label:"Patient",cp:"#b3c6f0",tp:"#1a2a4a",cv:"#2563eb",tv:"#fff",card:"#172d5a",brd:"#3b6fd4",
+   items:[
+    {t:"2 VVP fonctionnelles et testées / 1 VVP avec rampe"},
+    {t:"SCOPE : TA, pouls, SpO₂, Capno"},
+    {t:"Installation : brancard/coquille, place à la tête, position amendée de Jackson"},
+    {t:"Pré-oxygénation (BAVU, MHC / OHD / VNI)"},
+    {t:"Hémodynamique optimisée (remplissage et/ou Noradrénaline)"},
+  ]},
+  {id:"plan",label:"Plan",cp:"#c8e6c9",tp:"#1b3a1c",cv:"#2e7d32",tv:"#fff",card:"#1b3a1c",brd:"#4caf50",type:"plan"},
+  {id:"equipe",label:"Équipe",cp:"#fff9c4",tp:"#3d3000",cv:"#f9a825",tv:"#3d3000",card:"#2a2200",brd:"#f9a825",
+   items:[
+    {t:"Chaque membre connaît son rôle"},
+    {t:"Aucune question en suspens"},
+    {t:"Dernier point de situation avant le geste"},
+  ]},
+  {id:"materiel",label:"Matériel",cp:"#c8e6c9",tp:"#1b3a1c",cv:"#388e3c",tv:"#fff",card:"#1a3020",brd:"#66bb6a",
+   items:[
+    {t:"Source d'oxygène vérifiée"},
+    {t:"Aspiration testée, Yankauer en place"},
+    {t:"Respirateur monté, auto-test effectué, pré-réglé"},
+    {t:"> 2 PSE disponibles"},
+    {t:"BAVU prêt, masque facial adapté, valve testée"},
+    {t:"Guedel taille adaptée"},
+    {t:"Capteur Capno connecté (BAVU + Scope)"},
+    {t:"Sonde d'intubation + lubrifiant + seringue 10 mL fixée sur le ballonnet", sonde:true},
+    {t:"Stylet rigide (de taille adaptée à la sonde IOT)"},
+    {t:"Lanière de fixation"},
+    {t:"Mandrin Long Béquillé (FROVA / ESCHMANN)"},
+  ]},
+  {id:"drogues",label:"Drogues",cp:"#b3d4f5",tp:"#0a2040",cv:"#1565c0",tv:"#fff",card:"#0d2240",brd:"#2196f3",type:"drogues"},
+];
+
+const PLANS=[
+  {id:"A",color:"#4caf50",bg:"#1b3a1c",title:"Plan A",sub:"Intubation oro-trachéale",
+   opts:[{id:"laryngo",label:"Laryngoscopie directe"},{id:"videolaryngo",label:"Vidéo-laryngoscopie McGrath®"}],trigger:null},
+  {id:"B",color:"#f5c518",bg:"#2a2000",title:"Plan B",sub:"Abord supraglottique",
+   opts:[{id:"fastrach",label:"FASTRACH®"},{id:"igel",label:"IGEL®"}],
+   trigger:{text:"Si échec Plan A : > 2 tentatives ou SpO₂ < 92 % ou dégradation hémodynamique"}},
+  {id:"C",color:"#9e9e9e",bg:"#1c1c1c",title:"Plan C",sub:"Reprise au BAVU / ventilation masque",opts:[],
+   trigger:{text:"Si échec Plan B : dispositif non ventilant ou SpO₂ non maintenue"}},
+  {id:"D",color:"#ef4444",bg:"#2d0000",title:"Plan D",sub:"Non intubable / Non ventilable → CRICO",opts:[],
+   trigger:{text:"Si échec Plan C : SpO₂ < 80 % malgré optimisation ou obstruction totale"}},
+];
+
+const DG=[
+  {key:"induction_sed",label:"Induction — Sédatif",opts:[
+    {id:"ket",name:"KÉTAMINE",dose:"3 mg/kg",calc:w=>({s:1,v:(3*w).toFixed(0),u:"mg"})},
+    {id:"hyp",name:"HYPNOMIDATE",dose:"0,3 mg/kg",calc:w=>({s:1,v:(0.3*w).toFixed(1),u:"mg"})},
+  ]},
+  {key:"induction_cur",label:"Induction — Curare",opts:[
+    {id:"sux",name:"SUXAMÉTHONIUM",dose:"1 mg/kg",calc:w=>({s:1,v:(1*w).toFixed(0),u:"mg"})},
+    {id:"roc",name:"ROCURONIUM",dose:"0,8 mg/kg",calc:w=>({s:1,v:(0.8*w).toFixed(0),u:"mg"})},
+  ]},
+  {key:"relai_sed",label:"Relais — Sédatif",opts:[
+    {id:"mid",name:"MIDAZOLAM",dose:"0,05–0,1 mg/kg/h",calc:w=>({s:0,lo:(0.05*w).toFixed(1),hi:(0.1*w).toFixed(1),u:"mg/h"})},
+    {id:"pro",name:"PROPOFOL 1%",dose:"2–6 mg/kg/h",calc:w=>({s:0,lo:(2*w).toFixed(0),hi:(6*w).toFixed(0),u:"mg/h",n:"soit "+(2*w/10).toFixed(1)+"–"+(6*w/10).toFixed(1)+" mL/h"})},
+  ]},
+  {key:"relai_ant",label:"Relais — Antalgique",opts:[
+    {id:"suf",name:"SUFENTANIL",dose:"0,1–1 μg/kg/h",calc:w=>({s:0,lo:(0.1*w).toFixed(1),hi:(1*w).toFixed(1),u:"μg/h"})},
+    {id:"fen",name:"FENTANYL",dose:"2–3 μg/kg/h",calc:w=>({s:0,lo:(2*w).toFixed(0),hi:(3*w).toFixed(0),u:"μg/h"})},
+  ]},
+];
+
+// Drogues complémentaires : dispo + préparée
+const COMP=[
+  {label:"Éphédrine",k:"eph"},
+  {label:"Noradrénaline",k:"nor"},
+  {label:"Adrénaline",k:"adr"},
+  {label:"Curare",k:"cur"},
+];
+
+let ck={}, ds={induction_sed:null,induction_cur:null,relai_sed:null,relai_ant:null};
+let planSel={}, triggerNotes={B:"",C:"",D:""};
+let sondeNum="";
+let poids=0, act=0;
+let recognition=null, listening=false;
+
+function fastrach(w){if(w<50)return"T3";if(w<=70)return"T4";return"T5";}
+function igel(w){if(w<50)return"T3";if(w<=90)return"T4";return"T5";}
+
+function keys(s){
+  if(s.type==="plan") return ["plan_A","plan_B","plan_C","plan_D"];
+  if(s.type==="drogues"){
+    let a=["d_induction_sed","d_induction_cur","d_relai_sed","d_relai_ant"];
+    COMP.forEach(c=>{a.push("comp_"+c.k);});
+    return a;
+  }
+  // materiel: sonde item gets extra key for sonde num (non-blocking → excluded from progress)
+  return s.items.map((_,i)=>s.id+"_"+i);
+}
+function isDone(s){const k=keys(s);return k.length>0&&k.every(x=>ck[x]);}
+function updP(){
+  const tot=S.reduce((a,s)=>a+keys(s).length,0),d=Object.values(ck).filter(Boolean).length,p=tot?Math.round(d/tot*100):0;
+  document.getElementById("pl").textContent=d+" / "+tot+" éléments validés";
+  const f=document.getElementById("pf");f.style.width=p+"%";
+  f.style.background=p===100?"#22c55e":p>60?"#f59e0b":"#3b82f6";
+  document.getElementById("poids-display").textContent=poids>0?poids:"—";
+}
+function renderTabs(){
+  document.getElementById("tb").innerHTML=S.map((s,i)=>{
+    const d=isDone(s),isA=i===act;
+    let bg,col,sh="";
+    if(d){bg=s.cv;col=s.tv;sh="box-shadow:0 0 10px "+s.cv+"88;";}
+    else{bg=isA?s.cp+"ee":s.cp+"55";col=s.tp;}
+    return `<button class="tab" style="background:${bg};color:${col};${sh}" onclick="go(${i})">${d?'✓ ':''}${s.label}</button>`;
+  }).join("");
+}
+function go(i){act=i;renderTabs();render();window.scrollTo({top:0});}
+function tog(k){ck[k]=!ck[k];updP();renderTabs();render();}
+function togDual(k){ck[k]=!ck[k];updP();renderTabs();renderDualSection();}
+function selD(gk,oid){ds[gk]=(ds[gk]===oid)?null:oid;ck["d_"+gk]=!!ds[gk];updP();renderTabs();render();}
+function togglePlanOpt(planId,optId){planSel[planId]=(planSel[planId]===optId)?null:optId;ck["plan_"+planId]=!!planSel[planId];updP();renderTabs();render();}
+function togglePlanSimple(planId){ck["plan_"+planId]=!ck["plan_"+planId];updP();renderTabs();render();}
+function saveTrigger(planId,val){triggerNotes[planId]=val;}
+
+// Poids modal
+function openPoids(){
+  document.getElementById("poids-modal-bg").classList.add("show");
+  setTimeout(()=>{const el=document.getElementById("poids-input");if(el){el.value=poids||"";el.focus();}},100);
+}
+function closePoids(e){
+  if(e&&e.target!==document.getElementById("poids-modal-bg"))return;
+  document.getElementById("poids-modal-bg").classList.remove("show");
+  updP();renderTabs();render();
+}
+function setPoids(v){poids=v>0?v:0;updP();}
+
+// Voice
+function initVoice(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR)return null;
+  const r=new SR();r.lang='fr-FR';r.continuous=false;r.interimResults=false;
+  r.onresult=e=>{
+    const txt=e.results[0][0].transcript.replace(/[^0-9,\.]/g,'').replace(',','.');
+    const val=parseFloat(txt);
+    if(val>0&&val<300){poids=val;document.getElementById("poids-input").value=val;updP();}
+    stopListen();
+  };
+  r.onerror=()=>stopListen();r.onend=()=>stopListen();
+  return r;
+}
+function toggleListen(){listening?stopListen():startListen();}
+function startListen(){
+  if(!recognition)recognition=initVoice();
+  if(!recognition){alert("Reconnaissance vocale non disponible.");return;}
+  listening=true;recognition.start();
+  document.getElementById("poids-mic").classList.add("listening");
+  document.getElementById("hdr-mic").textContent="🔴";
+}
+function stopListen(){
+  listening=false;if(recognition)try{recognition.stop();}catch(e){}
+  const m=document.getElementById("poids-mic");if(m)m.classList.remove("listening");
+  document.getElementById("hdr-mic").textContent="🎤";
+}
+
+function calcH(o,w){
+  if(!w||w<=0)return'<div class="dcl">Entrez le poids pour calculer</div>';
+  const r=o.calc(w);
+  if(r.s)return`<div class="dcl">Dose calculée (${w} kg)</div><div class="dcv">${r.v} <span class="dcu">${r.u}</span></div>`;
+  return`<div class="dcl">Débit calculé (${w} kg)</div><div class="dcr">${r.lo} – ${r.hi} <span class="dcu">${r.u}</span></div>${r.n?`<div style="color:rgba(255,255,255,.35);font-size:11px;margin-top:2px">${r.n}</div>`:''}`;
+}
+
+function renderDualSection(){
+  // called separately to avoid full re-render when toggling duals mid-render
+  const s=S[act];if(s.type!=="drogues")return;
+  render();
+}
+
+function render(){
+  const s=S[act],c=document.getElementById("mc");let h="";
+
+  // ---- PLAN ----
+  if(s.type==="plan"){
+    if(isDone(s))h+=`<div class="ok show"><span style="font-size:20px">✓</span><span style="font-size:13px;color:#4ade80;font-weight:600">Section complétée !</span></div>`;
+    PLANS.forEach(p=>{
+      const isC=!!ck["plan_"+p.id],hasopts=p.opts.length>0;
+      if(p.trigger){
+        h+=`<div class="trigger"><span class="trigger-icon">⚡</span><div style="flex:1"><div class="trigger-text">${p.trigger.text}</div><textarea class="trigger-input" rows="1" placeholder="Notes libres…" oninput="saveTrigger('${p.id}',this.value);this.style.height='auto';this.style.height=this.scrollHeight+'px'">${triggerNotes[p.id]||''}</textarea></div></div>`;
+      }
+      h+=`<div class="plan-block" style="background:${p.bg};border:1.5px solid ${isC?p.color:p.color+'44'}">`;
+      if(!hasopts){
+        h+=`<div class="plan-header" onclick="togglePlanSimple('${p.id}')">
+          <div style="display:flex;align-items:center;gap:9px">
+            <div class="plan-badge" style="background:${p.color}22;color:${p.color}">${p.id}</div>
+            <div><div class="plan-title" style="color:${p.color}">${p.title}</div><div class="plan-sub">${p.sub}</div></div>
+          </div>
+          <div class="plan-chk ${isC?'on':''}" style="${isC?'background:'+p.color:'border-color:'+p.color+'66'}"><div class="ck"></div></div>
+        </div>`;
+      } else {
+        h+=`<div class="plan-header" style="cursor:default">
+          <div style="display:flex;align-items:center;gap:9px">
+            <div class="plan-badge" style="background:${p.color}22;color:${p.color}">${p.id}</div>
+            <div><div class="plan-title" style="color:${p.color}">${p.title}</div><div class="plan-sub">${p.sub}</div></div>
+          </div>
+          <div class="plan-chk ${isC?'on':''}" style="${isC?'background:'+p.color:'border-color:'+p.color+'66'}"><div class="ck"></div></div>
+        </div><div class="plan-opts">`;
+        p.opts.forEach(o=>{
+          const iS=planSel[p.id]===o.id;
+          let sb="";
+          if(p.id==="B"&&poids>0){
+            const sz=o.id==="fastrach"?fastrach(poids):igel(poids);
+            sb=`<span class="size-badge" style="background:${p.color}22;color:${p.color}">Taille ${sz}</span>`;
+          } else if(p.id==="B"){
+            sb=`<span class="size-badge" style="background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.3)">Entrer poids</span>`;
+          }
+          h+=`<div class="plan-opt ${iS?'sel':''}" style="color:${p.color};${iS?'background:'+p.color+'18':''}" onclick="togglePlanOpt('${p.id}','${o.id}')">
+            <div class="rdot ${iS?'sel':''}" style="color:${p.color}"></div>
+            <span style="font-size:13px;font-weight:500;color:rgba(255,255,255,0.87)">${o.label}</span>${sb}
+          </div>`;
+        });
+        h+=`</div>`;
+      }
+      h+=`</div>`;
+    });
+    const kk=keys(s),dn=kk.filter(x=>ck[x]).length;
+    h+=`<div style="text-align:center;padding:4px 0 2px"><span style="font-size:12px;color:rgba(255,255,255,.3)">${dn}/${kk.length} plans sélectionnés</span></div>`;
+    c.innerHTML=h;return;
+  }
+
+  // ---- DROGUES ----
+  if(s.type==="drogues"){
+    if(isDone(s))h+=`<div class="ok show"><span style="font-size:20px">✓</span><span style="font-size:13px;color:#4ade80;font-weight:600">Section complétée !</span></div>`;
+    if(!poids){
+      h+=`<div style="background:#1e2a40;border-radius:14px;padding:14px;margin-bottom:10px;border:1px solid rgba(249,168,37,0.3);display:flex;align-items:center;gap:10px">
+        <span style="font-size:20px">⚖️</span>
+        <div><div style="font-size:13px;font-weight:600;color:#f9a825">Poids non renseigné</div><div style="font-size:12px;color:rgba(255,255,255,.4);margin-top:2px">Appuyez sur le bouton orange en haut à droite</div></div>
+      </div>`;
+    }
+    DG.forEach(g=>{
+      h+=`<div class="card" style="background:${s.card};border:1px solid ${s.brd}22"><div class="stitle" style="color:${s.cv}">${g.label}</div>`;
+      g.opts.forEach(o=>{
+        const iS=ds[g.key]===o.id;
+        h+=`<div class="dopt ${iS?'sel':''}" onclick="selD('${g.key}','${o.id}')">
+          <div class="doh"><div style="display:flex;align-items:center;gap:9px"><div class="drdot ${iS?'sel':''}"></div><span class="dn2">${o.name}</span></div><span class="dtag">${o.dose}</span></div>
+          ${iS?`<div class="dcalc">${calcH(o,poids)}</div>`:''}
+        </div>`;
+      });
+      h+=`</div>`;
+    });
+    // Drogues complémentaires dispo/préparée
+    h+=`<div class="card" style="background:${s.card};border:1px solid ${s.brd}22">
+      <div class="stitle" style="color:${s.cv}">Drogues complémentaires</div>
+      <div style="display:flex;justify-content:flex-end;gap:16px;margin-bottom:6px;padding-right:1px">
+        <span style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.35);letter-spacing:0.4px;text-transform:uppercase;width:42px;text-align:center">Dispo</span>
+        <span style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.35);letter-spacing:0.4px;text-transform:uppercase;width:42px;text-align:center">Prép.</span>
+      </div>
+`;
+    // compSel stores "dispo"|"prep"|null per drug
+    if(!window.compSel) window.compSel={};
+    COMP.forEach(comp=>{
+      const k="comp_"+comp.k;
+      const sel=window.compSel[comp.k]||null;
+      const validated=!!ck[k];
+      const dispoDimmed = sel==='prep';
+      const prepDimmed  = sel==='dispo';
+      h+=`<div class="dual-row">
+        <span class="dual-label" style="color:rgba(255,255,255,${sel?'.5':'.9'})">${comp.label}</span>
+        <div class="dual-checks">
+          <div class="dual-check-item" onclick="selComp('${comp.k}','dispo')" style="opacity:${dispoDimmed?'0.3':'1'};transition:opacity 0.2s">
+            <span class="dual-check-lbl">Dispo</span>
+            <div class="dual-cb ${sel==='dispo'?'on':''}" style="border-color:${sel==='dispo'?s.cv:s.brd};${sel==='dispo'?'background:'+s.cv:''}"><div class="ck"></div></div>
+          </div>
+          <div class="dual-check-item" onclick="selComp('${comp.k}','prep')" style="opacity:${prepDimmed?'0.3':'1'};transition:opacity 0.2s">
+            <span class="dual-check-lbl">Prép.</span>
+            <div class="dual-cb ${sel==='prep'?'on':''}" style="border-color:${sel==='prep'?s.cv:s.brd};${sel==='prep'?'background:'+s.cv:''}"><div class="ck"></div></div>
+          </div>
+        </div>
+      </div>`;
+    });
+    h+=`</div>`;
+    const kk=keys(s),dn=kk.filter(x=>ck[x]).length;
+    h+=`<div style="text-align:center;padding:4px 0"><span style="font-size:12px;color:rgba(255,255,255,.3)">${dn}/${kk.length} items validés</span></div>`;
+    c.innerHTML=h;return;
+  }
+
+  // ---- CHECK LISTS ----
+  if(isDone(s))h+=`<div class="ok show"><span style="font-size:20px">✓</span><span style="font-size:13px;color:#4ade80;font-weight:600">Section complétée !</span></div>`;
+  h+=`<div class="card" style="background:${s.card};border:1px solid ${s.brd}22"><div class="stitle" style="color:${s.cv}">${s.label}</div>`;
+  s.items.forEach((item,i)=>{
+    const k=s.id+"_"+i,d=ck[k];
+    h+=`<div class="ci" onclick="tog('${k}')">
+      <div class="cb ${d?'on':''}" style="border-color:${d?s.cv:s.brd};${d?'background:'+s.cv:''}"><div class="ck"></div></div>
+      <div style="flex:1">
+        <span class="it ${d?'dn':''}" style="color:rgba(255,255,255,${d?.4:.9})">${item.t}</span>
+        ${item.sonde?`<div class="sonde-row"><input class="sonde-input" type="text" placeholder="N° sonde" value="${sondeNum}" oninput="sondeNum=this.value" onclick="event.stopPropagation()"/><span style="font-size:12px;color:rgba(255,255,255,.4)">mm</span></div>`:''}
+      </div>
+    </div>`;
+  });
+  h+=`</div>`;
+  const kk=keys(s),dn=kk.filter(x=>ck[x]).length;
+  if(kk.length>0)h+=`<div style="text-align:center;padding:4px 0"><span style="font-size:12px;color:rgba(255,255,255,.3)">${dn}/${kk.length} items cochés</span></div>`;
+  c.innerHTML=h;
+}
+
+function selComp(drugKey, choice){
+  if(!window.compSel) window.compSel={};
+  // toggle: clicking same choice again deselects
+  if(window.compSel[drugKey]===choice){
+    window.compSel[drugKey]=null;
+    ck["comp_"+drugKey]=false;
+  } else {
+    window.compSel[drugKey]=choice;
+    ck["comp_"+drugKey]=true;
+  }
+  updP();renderTabs();render();
+}
+
+function resetAll(){
+  if(confirm("Réinitialiser toute la checklist ?")){
+    ck={};ds={induction_sed:null,induction_cur:null,relai_sed:null,relai_ant:null};
+    planSel={};triggerNotes={B:"",C:"",D:""};sondeNum="";poids=0;
+    window.compSel={};
+    updP();renderTabs();render();
+  }
+}
+renderTabs();render();updP();
+</script>
+</body>
+</html>
