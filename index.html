@@ -9,22 +9,41 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:#1a1a2e;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;color:#fff;min-height:100vh}
-
-/* HEADER */
 .hdr{background:#1a1a2e;padding:env(safe-area-inset-top,10px) 12px 7px;position:sticky;top:0;z-index:100;border-bottom:1px solid rgba(255,255,255,0.06)}
 .hdr-row{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .hdr-left h1{font-size:12px;font-weight:700;color:#fff;white-space:nowrap}
 .hdr-left p{color:rgba(255,255,255,0.45);font-size:11px;margin-top:1px}
 .pbar{height:2px;background:rgba(255,255,255,0.1);margin:5px 0 0;border-radius:2px}
 .pfill{height:100%;border-radius:2px;transition:width 0.4s}
-
-/* POIDS BOX */
 .poids-box{background:linear-gradient(135deg,#e65c00,#f9a825);border-radius:12px;padding:7px 11px;display:flex;align-items:center;gap:7px;cursor:pointer;flex-shrink:0}
 .poids-box-val{font-size:18px;font-weight:800;color:#fff;min-width:38px;text-align:center}
 .poids-box-lbl{font-size:10px;color:rgba(255,255,255,0.8);font-weight:600;line-height:1.2}
 .poids-box-mic{font-size:16px;cursor:pointer;padding:2px}
-.poids-box-mic.listening{animation:pulse 1s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+
+/* SESSION BANNER */
+.session-bar{background:rgba(255,255,255,0.05);border-bottom:1px solid rgba(255,255,255,0.07);padding:6px 12px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.session-code{font-size:18px;font-weight:800;letter-spacing:4px;color:#f9a825}
+.session-dot{width:8px;height:8px;border-radius:50%;background:#22c55e;display:inline-block;margin-right:4px}
+.session-dot.off{background:#ef4444}
+.session-users{font-size:11px;color:rgba(255,255,255,0.5)}
+.sync-flash{animation:flash 0.4s ease}
+@keyframes flash{0%,100%{opacity:1}50%{opacity:0.3}}
+
+/* SESSION MODAL */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:600;display:flex;align-items:center;justify-content:center;padding:20px}
+.modal-bg.hidden{display:none}
+.modal{background:#1e2040;border-radius:22px;padding:24px 20px;width:100%;max-width:360px}
+.modal h2{font-size:17px;font-weight:700;margin-bottom:6px;color:#fff}
+.modal p{font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:18px;line-height:1.5}
+.modal-btn{width:100%;padding:13px;border-radius:13px;font-size:14px;font-weight:700;cursor:pointer;border:none;margin-bottom:10px;transition:all 0.2s}
+.modal-btn.primary{background:#2563eb;color:#fff}
+.modal-btn.secondary{background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.8)}
+.modal-btn.danger{background:rgba(239,68,68,0.15);color:#ef4444;border:1px solid rgba(239,68,68,0.3)}
+.code-input{width:100%;background:rgba(0,0,0,0.3);border:2px solid rgba(255,255,255,0.15);border-radius:12px;padding:14px;font-size:28px;font-weight:800;color:#f9a825;text-align:center;letter-spacing:6px;outline:none;margin-bottom:12px;-webkit-appearance:none}
+.code-input:focus{border-color:#f9a825}
+.role-select{display:flex;gap:8px;margin-bottom:14px}
+.role-btn{flex:1;padding:10px 6px;border-radius:10px;border:1.5px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.6);font-size:12px;font-weight:600;cursor:pointer;text-align:center;transition:all 0.2s}
+.role-btn.sel{border-color:#2563eb;background:rgba(37,99,235,0.15);color:#93c5fd}
 
 /* POIDS MODAL */
 .poids-modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:500;display:none;align-items:flex-end;justify-content:center}
@@ -35,14 +54,13 @@ body{background:#1a1a2e;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Tex
 .pv{background:rgba(0,0,0,0.3);border:2px solid #f9a825;border-radius:11px;padding:10px 12px;font-size:22px;font-weight:700;color:#f9a825;width:110px;outline:none;text-align:center;-webkit-appearance:none}
 .pv::placeholder{color:rgba(255,255,255,0.2);font-size:14px;font-weight:400}
 .mic-btn{width:44px;height:44px;border-radius:50%;border:2px solid rgba(249,168,37,0.4);background:rgba(249,168,37,0.1);display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;transition:all 0.2s;-webkit-tap-highlight-color:transparent}
-.mic-btn.listening{background:rgba(239,68,68,0.2);border-color:#ef4444;animation:pulse 1s infinite}
+.mic-btn.listening{background:rgba(239,68,68,0.2);border-color:#ef4444}
 .poids-close{margin-top:6px;width:100%;padding:12px;background:rgba(249,168,37,0.15);border:1px solid rgba(249,168,37,0.3);border-radius:12px;color:#f9a825;font-size:14px;font-weight:600;cursor:pointer}
 
 /* TABS */
 .tabs{display:flex;gap:5px;padding:6px 12px;overflow-x:auto;scrollbar-width:none;background:#1a1a2e;position:sticky;top:0;z-index:99}
 .tabs::-webkit-scrollbar{display:none}
 .tab{padding:7px 11px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap;border:none;transition:all 0.3s;display:flex;align-items:center;gap:3px;-webkit-tap-highlight-color:transparent}
-
 .cnt{padding:10px 12px 100px}
 .card{border-radius:16px;padding:14px;margin-bottom:10px}
 .stitle{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:12px}
@@ -56,15 +74,10 @@ body{background:#1a1a2e;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Tex
 .it.dn{text-decoration:line-through;opacity:0.4}
 .ok{background:rgba(34,197,94,0.15);border:1px solid rgba(34,197,94,0.3);border-radius:12px;padding:11px 14px;margin-bottom:10px;display:none;align-items:center;gap:10px}
 .ok.show{display:flex}
-
-/* sonde N° input inline */
 .sonde-row{display:flex;align-items:center;gap:8px;margin-top:6px}
 .sonde-input{background:rgba(0,0,0,0.3);border:1.5px solid rgba(255,255,255,0.15);border-radius:8px;padding:5px 10px;font-size:13px;color:#fff;width:80px;outline:none;text-align:center;-webkit-appearance:none}
 .sonde-input::placeholder{color:rgba(255,255,255,0.25);font-size:11px}
-.sonde-input:focus{border-color:rgba(255,255,255,0.4)}
-
-/* dual checkbox (dispo / préparée) */
-.dual-row{display:flex;align-items:center;gap:0;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.07)}
+.dual-row{display:flex;align-items:center;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.07)}
 .dual-row:last-child{border-bottom:none;padding-bottom:0}
 .dual-label{font-size:14px;flex:1;line-height:1.35;padding-right:6px}
 .dual-checks{display:flex;gap:10px;flex-shrink:0}
@@ -74,8 +87,6 @@ body{background:#1a1a2e;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Tex
 .dual-cb.on{border-color:transparent!important}
 .dual-cb .ck{display:none}
 .dual-cb.on .ck{display:block}
-
-/* PLAN */
 .plan-block{border-radius:14px;margin-bottom:8px;overflow:hidden}
 .plan-header{display:flex;align-items:center;justify-content:space-between;padding:11px 13px;-webkit-tap-highlight-color:transparent}
 .plan-badge{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0}
@@ -96,8 +107,6 @@ body{background:#1a1a2e;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Tex
 .trigger-text{font-size:12px;color:rgba(255,255,255,0.5);line-height:1.4}
 .trigger-input{font-size:12px;color:rgba(255,255,255,0.7);background:transparent;border:none;outline:none;width:100%;resize:none;font-family:inherit;line-height:1.4;margin-top:2px}
 .trigger-input::placeholder{color:rgba(255,255,255,0.22)}
-
-/* DRUGS */
 .dopt{border-radius:12px;border:1.5px solid rgba(255,255,255,0.1);padding:11px 13px;cursor:pointer;margin-bottom:9px;transition:all 0.2s;-webkit-tap-highlight-color:transparent}
 .dopt:last-child{margin-bottom:0}
 .dopt.sel{border-color:#10b981;background:rgba(16,185,129,0.12)}
@@ -113,9 +122,7 @@ body{background:#1a1a2e;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Tex
 .drdot{width:18px;height:18px;min-width:18px;border-radius:50%;border:2px solid rgba(255,255,255,0.25);display:flex;align-items:center;justify-content:center}
 .drdot.sel{border-color:#10b981}
 .drdot.sel::after{content:'';width:9px;height:9px;border-radius:50%;background:#10b981;display:block}
-
 .reset-btn{position:fixed;bottom:max(20px,env(safe-area-inset-bottom));right:14px;background:#2a2a4a;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.55);padding:9px 15px;border-radius:18px;font-size:12px;font-weight:600;cursor:pointer;z-index:200;-webkit-tap-highlight-color:transparent}
-
 @media(orientation:landscape){
   .hdr{padding:4px 12px 4px}
   .tabs{padding:4px 12px}
@@ -134,19 +141,49 @@ body{background:#1a1a2e;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Tex
       <h1>Check list d'intubation hors AC</h1>
       <p id="pl">0 / 0 éléments validés</p>
     </div>
-    <!-- POIDS BOX -->
     <div class="poids-box" onclick="openPoids()">
-      <div>
-        <div class="poids-box-lbl">POIDS</div>
-        <div class="poids-box-val" id="poids-display">—</div>
-      </div>
-      <div>
-        <div class="poids-box-lbl">kg</div>
-        <div class="poids-box-mic" id="hdr-mic">🎤</div>
-      </div>
+      <div><div class="poids-box-lbl">POIDS</div><div class="poids-box-val" id="poids-display">—</div></div>
+      <div><div class="poids-box-lbl">kg</div><div class="poids-box-mic" id="hdr-mic">🎤</div></div>
     </div>
   </div>
   <div class="pbar"><div class="pfill" id="pf" style="width:0%"></div></div>
+</div>
+
+<!-- SESSION BANNER -->
+<div class="session-bar" id="session-bar">
+  <div style="display:flex;align-items:center;gap:8px">
+    <span class="session-dot off" id="sync-dot"></span>
+    <span class="session-users" id="sync-label">Non connecté</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px">
+    <span class="session-code" id="session-code-display"></span>
+    <button onclick="openSessionModal()" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.7);padding:5px 12px;border-radius:10px;font-size:11px;font-weight:600;cursor:pointer">Session</button>
+  </div>
+</div>
+
+<!-- SESSION MODAL -->
+<div class="modal-bg hidden" id="session-modal">
+  <div class="modal" id="session-modal-inner">
+    <h2>Session partagée</h2>
+    <p>Créez ou rejoignez une session pour synchroniser la checklist avec votre équipe en temps réel.</p>
+    <div id="role-section" style="margin-bottom:4px">
+      <div style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:8px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px">Votre rôle</div>
+      <div class="role-select">
+        <div class="role-btn sel" id="role-med" onclick="setRole('Médecin')">👨‍⚕️ Médecin</div>
+        <div class="role-btn" id="role-ide" onclick="setRole('IDE')">💉 IDE</div>
+        <div class="role-btn" id="role-amb" onclick="setRole('Conducteur')">🚑 Conducteur</div>
+      </div>
+    </div>
+    <button class="modal-btn primary" onclick="createSession()">➕ Créer une session</button>
+    <div style="text-align:center;font-size:12px;color:rgba(255,255,255,0.3);margin:4px 0">— ou —</div>
+    <input class="code-input" type="text" id="join-code-input" maxlength="4" placeholder="CODE" oninput="this.value=this.value.toUpperCase()"/>
+    <button class="modal-btn secondary" onclick="joinSession()">Rejoindre cette session</button>
+    <div id="session-error" style="color:#ef4444;font-size:12px;text-align:center;margin-top:6px;min-height:18px"></div>
+    <div id="leave-btn-wrap" style="display:none;margin-top:4px">
+      <button class="modal-btn danger" onclick="leaveSession()">Quitter la session</button>
+    </div>
+    <button class="modal-btn secondary" onclick="closeSessionModal()" style="margin-top:4px">Fermer</button>
+  </div>
 </div>
 
 <!-- POIDS MODAL -->
@@ -154,12 +191,11 @@ body{background:#1a1a2e;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Tex
   <div class="poids-modal">
     <h2>Poids du patient</h2>
     <div class="poids-modal-row">
-      <input class="pv" type="number" inputmode="decimal" min="1" max="200" placeholder="— kg" id="poids-input"
-        oninput="setPoids(parseFloat(this.value)||0)"/>
+      <input class="pv" type="number" inputmode="decimal" min="1" max="200" placeholder="— kg" id="poids-input" oninput="setPoids(parseFloat(this.value)||0)"/>
       <span style="color:rgba(255,255,255,.5);font-size:16px;font-weight:600">kg</span>
       <button class="mic-btn" id="poids-mic" onclick="toggleListen()">🎤</button>
     </div>
-    <div style="font-size:12px;color:rgba(255,255,255,.35);margin-bottom:10px" id="poids-hint">Saisir ou dicter le poids</div>
+    <div style="font-size:12px;color:rgba(255,255,255,.35);margin-bottom:10px">Saisir ou dicter le poids</div>
     <button class="poids-close" onclick="closePoids()">Valider</button>
   </div>
 </div>
@@ -168,8 +204,21 @@ body{background:#1a1a2e;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Tex
 <div class="cnt" id="mc"></div>
 <button class="reset-btn" onclick="resetAll()">🔄 Réinit.</button>
 
+<!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
 <script>
-// ---- SECTIONS (order: Patient / Plan / Equipe / Materiel / Drogues) ----
+// ── FIREBASE CONFIG ──
+const firebaseConfig = {
+  apiKey: "AIzaSyCIrs7O3OdGlSTUYcxqDe9C91lw9l3DRNI",
+  databaseURL: "https://smur-intubation-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "smur-intubation",
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+// ── DATA ──
 const S=[
   {id:"patient",label:"Patient",cp:"#b3c6f0",tp:"#1a2a4a",cv:"#2563eb",tv:"#fff",card:"#172d5a",brd:"#3b6fd4",
    items:[
@@ -195,7 +244,7 @@ const S=[
     {t:"BAVU prêt, masque facial adapté, valve testée"},
     {t:"Guedel taille adaptée"},
     {t:"Capteur Capno connecté (BAVU + Scope)"},
-    {t:"Sonde d'intubation + lubrifiant + seringue 10 mL fixée sur le ballonnet", sonde:true},
+    {t:"Sonde d'intubation + lubrifiant + seringue 10 mL fixée sur le ballonnet",sonde:true},
     {t:"Stylet rigide (de taille adaptée à la sonde IOT)"},
     {t:"Lanière de fixation"},
     {t:"Mandrin Long Béquillé (FROVA / ESCHMANN)"},
@@ -234,7 +283,6 @@ const DG=[
   ]},
 ];
 
-// Drogues complémentaires : dispo + préparée
 const COMP=[
   {label:"Éphédrine",k:"eph"},
   {label:"Noradrénaline",k:"nor"},
@@ -242,23 +290,127 @@ const COMP=[
   {label:"Curare",k:"cur"},
 ];
 
+// ── STATE ──
 let ck={}, ds={induction_sed:null,induction_cur:null,relai_sed:null,relai_ant:null};
 let planSel={}, triggerNotes={B:"",C:"",D:""};
-let sondeNum="";
-let poids=0, act=0;
+let compSel={};
+let sondeNum="", poids=0, act=0;
 let recognition=null, listening=false;
 
+// ── SESSION ──
+let sessionCode=null, userRole="Médecin", dbRef=null, dbListener=null;
+let isSyncing=false; // prevent feedback loop
+
+function genCode(){return Math.floor(1000+Math.random()*9000).toString();}
+
+function setRole(r){
+  userRole=r;
+  ["med","ide","amb"].forEach(id=>document.getElementById("role-"+id).classList.remove("sel"));
+  const map={Médecin:"med",IDE:"ide",Conducteur:"amb"};
+  document.getElementById("role-"+map[r]).classList.add("sel");
+}
+
+async function createSession(){
+  const code=genCode();
+  const ref=db.ref("sessions/"+code);
+  const snap=await ref.once("value");
+  if(snap.exists()){createSession();return;} // code taken, retry
+  await ref.set({created:Date.now(),state:getFullState()});
+  await attachSession(code);
+  closeSessionModal();
+}
+
+async function joinSession(){
+  const code=document.getElementById("join-code-input").value.trim().toUpperCase();
+  if(code.length!==4){showSessionError("Entrez un code à 4 chiffres");return;}
+  const snap=await db.ref("sessions/"+code).once("value");
+  if(!snap.exists()){showSessionError("Session introuvable — vérifiez le code");return;}
+  await attachSession(code);
+  // Load remote state
+  const remoteState=snap.val().state;
+  if(remoteState) applyState(remoteState);
+  closeSessionModal();
+}
+
+async function attachSession(code){
+  if(dbRef&&dbListener) dbRef.off("value",dbListener);
+  sessionCode=code;
+  dbRef=db.ref("sessions/"+code+"/state");
+  // Announce presence
+  const presRef=db.ref("sessions/"+code+"/users/"+userRole);
+  presRef.set({role:userRole,ts:Date.now()});
+  presRef.onDisconnect().remove();
+  // Listen to state changes
+  dbListener=dbRef.on("value",snap=>{
+    if(isSyncing) return;
+    const remoteState=snap.val();
+    if(remoteState){
+      applyState(remoteState);
+      flashSync();
+    }
+  });
+  // Listen to user count
+  db.ref("sessions/"+code+"/users").on("value",snap=>{
+    const users=snap.val()||{};
+    const names=Object.keys(users);
+    document.getElementById("sync-dot").className="session-dot";
+    document.getElementById("sync-label").textContent=names.length+" connecté"+(names.length>1?"s":"")+" : "+names.join(", ");
+    document.getElementById("session-code-display").textContent=code;
+    document.getElementById("leave-btn-wrap").style.display="block";
+  });
+}
+
+function leaveSession(){
+  if(dbRef&&dbListener){dbRef.off("value",dbListener);dbListener=null;}
+  if(sessionCode){
+    db.ref("sessions/"+sessionCode+"/users/"+userRole).remove();
+  }
+  sessionCode=null;dbRef=null;
+  document.getElementById("sync-dot").className="session-dot off";
+  document.getElementById("sync-label").textContent="Non connecté";
+  document.getElementById("session-code-display").textContent="";
+  document.getElementById("leave-btn-wrap").style.display="none";
+  closeSessionModal();
+}
+
+function pushState(){
+  if(!sessionCode||!dbRef) return;
+  isSyncing=true;
+  dbRef.set(getFullState()).then(()=>{setTimeout(()=>{isSyncing=false;},300);});
+}
+
+function getFullState(){
+  return{ck,ds,planSel,triggerNotes,compSel,sondeNum,poids};
+}
+
+function applyState(st){
+  if(st.ck) ck=st.ck;
+  if(st.ds) ds=st.ds;
+  if(st.planSel) planSel=st.planSel;
+  if(st.triggerNotes) triggerNotes=st.triggerNotes;
+  if(st.compSel) compSel=st.compSel;
+  if(st.sondeNum!==undefined) sondeNum=st.sondeNum;
+  if(st.poids!==undefined) poids=st.poids;
+  updP();renderTabs();render();
+}
+
+function flashSync(){
+  const bar=document.getElementById("session-bar");
+  bar.classList.add("sync-flash");
+  setTimeout(()=>bar.classList.remove("sync-flash"),400);
+}
+
+function showSessionError(msg){document.getElementById("session-error").textContent=msg;}
+function openSessionModal(){document.getElementById("session-modal").classList.remove("hidden");document.getElementById("session-error").textContent="";}
+function closeSessionModal(){document.getElementById("session-modal").classList.add("hidden");}
+
+// ── HELPERS ──
 function fastrach(w){if(w<50)return"T3";if(w<=70)return"T4";return"T5";}
 function igel(w){if(w<50)return"T3";if(w<=90)return"T4";return"T5";}
 
 function keys(s){
-  if(s.type==="plan") return ["plan_A","plan_B","plan_C","plan_D"];
-  if(s.type==="drogues"){
-    let a=["d_induction_sed","d_induction_cur","d_relai_sed","d_relai_ant"];
-    COMP.forEach(c=>{a.push("comp_"+c.k);});
-    return a;
-  }
-  // materiel: sonde item gets extra key for sonde num (non-blocking → excluded from progress)
+  if(s.type==="plan") return["plan_A","plan_B","plan_C","plan_D"];
+  if(s.type==="drogues"){let a=["d_induction_sed","d_induction_cur","d_relai_sed","d_relai_ant"];COMP.forEach(c=>a.push("comp_"+c.k));return a;}
   return s.items.map((_,i)=>s.id+"_"+i);
 }
 function isDone(s){const k=keys(s);return k.length>0&&k.every(x=>ck[x]);}
@@ -275,18 +427,25 @@ function renderTabs(){
     let bg,col,sh="";
     if(d){bg=s.cv;col=s.tv;sh="box-shadow:0 0 10px "+s.cv+"88;";}
     else{bg=isA?s.cp+"ee":s.cp+"55";col=s.tp;}
-    return `<button class="tab" style="background:${bg};color:${col};${sh}" onclick="go(${i})">${d?'✓ ':''}${s.label}</button>`;
+    return`<button class="tab" style="background:${bg};color:${col};${sh}" onclick="go(${i})">${d?"✓ ":""}${s.label}</button>`;
   }).join("");
 }
 function go(i){act=i;renderTabs();render();window.scrollTo({top:0});}
-function tog(k){ck[k]=!ck[k];updP();renderTabs();render();}
-function togDual(k){ck[k]=!ck[k];updP();renderTabs();renderDualSection();}
-function selD(gk,oid){ds[gk]=(ds[gk]===oid)?null:oid;ck["d_"+gk]=!!ds[gk];updP();renderTabs();render();}
-function togglePlanOpt(planId,optId){planSel[planId]=(planSel[planId]===optId)?null:optId;ck["plan_"+planId]=!!planSel[planId];updP();renderTabs();render();}
-function togglePlanSimple(planId){ck["plan_"+planId]=!ck["plan_"+planId];updP();renderTabs();render();}
-function saveTrigger(planId,val){triggerNotes[planId]=val;}
 
-// Poids modal
+function tog(k){ck[k]=!ck[k];updP();renderTabs();render();pushState();}
+function selD(gk,oid){ds[gk]=(ds[gk]===oid)?null:oid;ck["d_"+gk]=!!ds[gk];updP();renderTabs();render();pushState();}
+function togglePlanOpt(planId,optId){planSel[planId]=(planSel[planId]===optId)?null:optId;ck["plan_"+planId]=!!planSel[planId];updP();renderTabs();render();pushState();}
+function togglePlanSimple(planId){ck["plan_"+planId]=!ck["plan_"+planId];updP();renderTabs();render();pushState();}
+function saveTrigger(planId,val){triggerNotes[planId]=val;pushState();}
+function saveSonde(val){sondeNum=val;pushState();}
+
+function selComp(drugKey,choice){
+  if(compSel[drugKey]===choice){compSel[drugKey]=null;ck["comp_"+drugKey]=false;}
+  else{compSel[drugKey]=choice;ck["comp_"+drugKey]=true;}
+  updP();renderTabs();render();pushState();
+}
+
+// ── POIDS ──
 function openPoids(){
   document.getElementById("poids-modal-bg").classList.add("show");
   setTimeout(()=>{const el=document.getElementById("poids-input");if(el){el.value=poids||"";el.focus();}},100);
@@ -294,17 +453,17 @@ function openPoids(){
 function closePoids(e){
   if(e&&e.target!==document.getElementById("poids-modal-bg"))return;
   document.getElementById("poids-modal-bg").classList.remove("show");
-  updP();renderTabs();render();
+  updP();renderTabs();render();pushState();
 }
 function setPoids(v){poids=v>0?v:0;updP();}
 
-// Voice
+// ── VOICE ──
 function initVoice(){
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
   if(!SR)return null;
-  const r=new SR();r.lang='fr-FR';r.continuous=false;r.interimResults=false;
+  const r=new SR();r.lang="fr-FR";r.continuous=false;r.interimResults=false;
   r.onresult=e=>{
-    const txt=e.results[0][0].transcript.replace(/[^0-9,\.]/g,'').replace(',','.');
+    const txt=e.results[0][0].transcript.replace(/[^0-9,\.]/g,"").replace(",",".");
     const val=parseFloat(txt);
     if(val>0&&val<300){poids=val;document.getElementById("poids-input").value=val;updP();}
     stopListen();
@@ -326,38 +485,33 @@ function stopListen(){
   document.getElementById("hdr-mic").textContent="🎤";
 }
 
+// ── CALC ──
 function calcH(o,w){
   if(!w||w<=0)return'<div class="dcl">Entrez le poids pour calculer</div>';
   const r=o.calc(w);
   if(r.s)return`<div class="dcl">Dose calculée (${w} kg)</div><div class="dcv">${r.v} <span class="dcu">${r.u}</span></div>`;
-  return`<div class="dcl">Débit calculé (${w} kg)</div><div class="dcr">${r.lo} – ${r.hi} <span class="dcu">${r.u}</span></div>${r.n?`<div style="color:rgba(255,255,255,.35);font-size:11px;margin-top:2px">${r.n}</div>`:''}`;
+  return`<div class="dcl">Débit calculé (${w} kg)</div><div class="dcr">${r.lo} – ${r.hi} <span class="dcu">${r.u}</span></div>${r.n?`<div style="color:rgba(255,255,255,.35);font-size:11px;margin-top:2px">${r.n}</div>`:""}`;
 }
 
-function renderDualSection(){
-  // called separately to avoid full re-render when toggling duals mid-render
-  const s=S[act];if(s.type!=="drogues")return;
-  render();
-}
-
+// ── RENDER ──
 function render(){
   const s=S[act],c=document.getElementById("mc");let h="";
 
-  // ---- PLAN ----
   if(s.type==="plan"){
     if(isDone(s))h+=`<div class="ok show"><span style="font-size:20px">✓</span><span style="font-size:13px;color:#4ade80;font-weight:600">Section complétée !</span></div>`;
     PLANS.forEach(p=>{
       const isC=!!ck["plan_"+p.id],hasopts=p.opts.length>0;
       if(p.trigger){
-        h+=`<div class="trigger"><span class="trigger-icon">⚡</span><div style="flex:1"><div class="trigger-text">${p.trigger.text}</div><textarea class="trigger-input" rows="1" placeholder="Notes libres…" oninput="saveTrigger('${p.id}',this.value);this.style.height='auto';this.style.height=this.scrollHeight+'px'">${triggerNotes[p.id]||''}</textarea></div></div>`;
+        h+=`<div class="trigger"><span class="trigger-icon">⚡</span><div style="flex:1"><div class="trigger-text">${p.trigger.text}</div><textarea class="trigger-input" rows="1" placeholder="Notes libres…" oninput="saveTrigger('${p.id}',this.value);this.style.height='auto';this.style.height=this.scrollHeight+'px'">${triggerNotes[p.id]||""}</textarea></div></div>`;
       }
-      h+=`<div class="plan-block" style="background:${p.bg};border:1.5px solid ${isC?p.color:p.color+'44'}">`;
+      h+=`<div class="plan-block" style="background:${p.bg};border:1.5px solid ${isC?p.color:p.color+"44"}">`;
       if(!hasopts){
         h+=`<div class="plan-header" onclick="togglePlanSimple('${p.id}')">
           <div style="display:flex;align-items:center;gap:9px">
             <div class="plan-badge" style="background:${p.color}22;color:${p.color}">${p.id}</div>
             <div><div class="plan-title" style="color:${p.color}">${p.title}</div><div class="plan-sub">${p.sub}</div></div>
           </div>
-          <div class="plan-chk ${isC?'on':''}" style="${isC?'background:'+p.color:'border-color:'+p.color+'66'}"><div class="ck"></div></div>
+          <div class="plan-chk ${isC?"on":""}" style="${isC?"background:"+p.color:"border-color:"+p.color+"66"}"><div class="ck"></div></div>
         </div>`;
       } else {
         h+=`<div class="plan-header" style="cursor:default">
@@ -365,19 +519,15 @@ function render(){
             <div class="plan-badge" style="background:${p.color}22;color:${p.color}">${p.id}</div>
             <div><div class="plan-title" style="color:${p.color}">${p.title}</div><div class="plan-sub">${p.sub}</div></div>
           </div>
-          <div class="plan-chk ${isC?'on':''}" style="${isC?'background:'+p.color:'border-color:'+p.color+'66'}"><div class="ck"></div></div>
+          <div class="plan-chk ${isC?"on":""}" style="${isC?"background:"+p.color:"border-color:"+p.color+"66"}"><div class="ck"></div></div>
         </div><div class="plan-opts">`;
         p.opts.forEach(o=>{
           const iS=planSel[p.id]===o.id;
           let sb="";
-          if(p.id==="B"&&poids>0){
-            const sz=o.id==="fastrach"?fastrach(poids):igel(poids);
-            sb=`<span class="size-badge" style="background:${p.color}22;color:${p.color}">Taille ${sz}</span>`;
-          } else if(p.id==="B"){
-            sb=`<span class="size-badge" style="background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.3)">Entrer poids</span>`;
-          }
-          h+=`<div class="plan-opt ${iS?'sel':''}" style="color:${p.color};${iS?'background:'+p.color+'18':''}" onclick="togglePlanOpt('${p.id}','${o.id}')">
-            <div class="rdot ${iS?'sel':''}" style="color:${p.color}"></div>
+          if(p.id==="B"&&poids>0){const sz=o.id==="fastrach"?fastrach(poids):igel(poids);sb=`<span class="size-badge" style="background:${p.color}22;color:${p.color}">Taille ${sz}</span>`;}
+          else if(p.id==="B"){sb=`<span class="size-badge" style="background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.3)">Entrer poids</span>`;}
+          h+=`<div class="plan-opt ${iS?"sel":""}" style="color:${p.color};${iS?"background:"+p.color+"18":""}" onclick="togglePlanOpt('${p.id}','${o.id}')">
+            <div class="rdot ${iS?"sel":""}" style="color:${p.color}"></div>
             <span style="font-size:13px;font-weight:500;color:rgba(255,255,255,0.87)">${o.label}</span>${sb}
           </div>`;
         });
@@ -390,52 +540,38 @@ function render(){
     c.innerHTML=h;return;
   }
 
-  // ---- DROGUES ----
   if(s.type==="drogues"){
     if(isDone(s))h+=`<div class="ok show"><span style="font-size:20px">✓</span><span style="font-size:13px;color:#4ade80;font-weight:600">Section complétée !</span></div>`;
-    if(!poids){
-      h+=`<div style="background:#1e2a40;border-radius:14px;padding:14px;margin-bottom:10px;border:1px solid rgba(249,168,37,0.3);display:flex;align-items:center;gap:10px">
-        <span style="font-size:20px">⚖️</span>
-        <div><div style="font-size:13px;font-weight:600;color:#f9a825">Poids non renseigné</div><div style="font-size:12px;color:rgba(255,255,255,.4);margin-top:2px">Appuyez sur le bouton orange en haut à droite</div></div>
-      </div>`;
-    }
+    if(!poids)h+=`<div style="background:#1e2a40;border-radius:14px;padding:14px;margin-bottom:10px;border:1px solid rgba(249,168,37,0.3);display:flex;align-items:center;gap:10px"><span style="font-size:20px">⚖️</span><div><div style="font-size:13px;font-weight:600;color:#f9a825">Poids non renseigné</div><div style="font-size:12px;color:rgba(255,255,255,.4);margin-top:2px">Appuyez sur le bouton orange en haut à droite</div></div></div>`;
     DG.forEach(g=>{
       h+=`<div class="card" style="background:${s.card};border:1px solid ${s.brd}22"><div class="stitle" style="color:${s.cv}">${g.label}</div>`;
       g.opts.forEach(o=>{
         const iS=ds[g.key]===o.id;
-        h+=`<div class="dopt ${iS?'sel':''}" onclick="selD('${g.key}','${o.id}')">
-          <div class="doh"><div style="display:flex;align-items:center;gap:9px"><div class="drdot ${iS?'sel':''}"></div><span class="dn2">${o.name}</span></div><span class="dtag">${o.dose}</span></div>
-          ${iS?`<div class="dcalc">${calcH(o,poids)}</div>`:''}
+        h+=`<div class="dopt ${iS?"sel":""}" onclick="selD('${g.key}','${o.id}')">
+          <div class="doh"><div style="display:flex;align-items:center;gap:9px"><div class="drdot ${iS?"sel":""}"></div><span class="dn2">${o.name}</span></div><span class="dtag">${o.dose}</span></div>
+          ${iS?`<div class="dcalc">${calcH(o,poids)}</div>`:""}
         </div>`;
       });
       h+=`</div>`;
     });
-    // Drogues complémentaires dispo/préparée
     h+=`<div class="card" style="background:${s.card};border:1px solid ${s.brd}22">
       <div class="stitle" style="color:${s.cv}">Drogues complémentaires</div>
       <div style="display:flex;justify-content:flex-end;gap:16px;margin-bottom:6px;padding-right:1px">
-        <span style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.35);letter-spacing:0.4px;text-transform:uppercase;width:42px;text-align:center">Dispo</span>
-        <span style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.35);letter-spacing:0.4px;text-transform:uppercase;width:42px;text-align:center">Prép.</span>
-      </div>
-`;
-    // compSel stores "dispo"|"prep"|null per drug
-    if(!window.compSel) window.compSel={};
+        <span style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.35);text-transform:uppercase;width:42px;text-align:center">Dispo</span>
+        <span style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.35);text-transform:uppercase;width:42px;text-align:center">Prép.</span>
+      </div>`;
     COMP.forEach(comp=>{
-      const k="comp_"+comp.k;
-      const sel=window.compSel[comp.k]||null;
-      const validated=!!ck[k];
-      const dispoDimmed = sel==='prep';
-      const prepDimmed  = sel==='dispo';
+      const sel=compSel[comp.k]||null;
       h+=`<div class="dual-row">
-        <span class="dual-label" style="color:rgba(255,255,255,${sel?'.5':'.9'})">${comp.label}</span>
+        <span class="dual-label" style="color:rgba(255,255,255,${sel?".5":".9"})">${comp.label}</span>
         <div class="dual-checks">
-          <div class="dual-check-item" onclick="selComp('${comp.k}','dispo')" style="opacity:${dispoDimmed?'0.3':'1'};transition:opacity 0.2s">
+          <div class="dual-check-item" onclick="selComp('${comp.k}','dispo')" style="opacity:${sel==="prep"?"0.3":"1"};transition:opacity 0.2s">
             <span class="dual-check-lbl">Dispo</span>
-            <div class="dual-cb ${sel==='dispo'?'on':''}" style="border-color:${sel==='dispo'?s.cv:s.brd};${sel==='dispo'?'background:'+s.cv:''}"><div class="ck"></div></div>
+            <div class="dual-cb ${sel==="dispo"?"on":""}" style="border-color:${sel==="dispo"?s.cv:s.brd};${sel==="dispo"?"background:"+s.cv:""}"><div class="ck"></div></div>
           </div>
-          <div class="dual-check-item" onclick="selComp('${comp.k}','prep')" style="opacity:${prepDimmed?'0.3':'1'};transition:opacity 0.2s">
+          <div class="dual-check-item" onclick="selComp('${comp.k}','prep')" style="opacity:${sel==="dispo"?"0.3":"1"};transition:opacity 0.2s">
             <span class="dual-check-lbl">Prép.</span>
-            <div class="dual-cb ${sel==='prep'?'on':''}" style="border-color:${sel==='prep'?s.cv:s.brd};${sel==='prep'?'background:'+s.cv:''}"><div class="ck"></div></div>
+            <div class="dual-cb ${sel==="prep"?"on":""}" style="border-color:${sel==="prep"?s.cv:s.brd};${sel==="prep"?"background:"+s.cv:""}"><div class="ck"></div></div>
           </div>
         </div>
       </div>`;
@@ -446,16 +582,15 @@ function render(){
     c.innerHTML=h;return;
   }
 
-  // ---- CHECK LISTS ----
   if(isDone(s))h+=`<div class="ok show"><span style="font-size:20px">✓</span><span style="font-size:13px;color:#4ade80;font-weight:600">Section complétée !</span></div>`;
   h+=`<div class="card" style="background:${s.card};border:1px solid ${s.brd}22"><div class="stitle" style="color:${s.cv}">${s.label}</div>`;
   s.items.forEach((item,i)=>{
     const k=s.id+"_"+i,d=ck[k];
     h+=`<div class="ci" onclick="tog('${k}')">
-      <div class="cb ${d?'on':''}" style="border-color:${d?s.cv:s.brd};${d?'background:'+s.cv:''}"><div class="ck"></div></div>
+      <div class="cb ${d?"on":""}" style="border-color:${d?s.cv:s.brd};${d?"background:"+s.cv:""}"><div class="ck"></div></div>
       <div style="flex:1">
-        <span class="it ${d?'dn':''}" style="color:rgba(255,255,255,${d?.4:.9})">${item.t}</span>
-        ${item.sonde?`<div class="sonde-row"><input class="sonde-input" type="text" placeholder="N° sonde" value="${sondeNum}" oninput="sondeNum=this.value" onclick="event.stopPropagation()"/><span style="font-size:12px;color:rgba(255,255,255,.4)">mm</span></div>`:''}
+        <span class="it ${d?"dn":""}" style="color:rgba(255,255,255,${d?.4:.9})">${item.t}</span>
+        ${item.sonde?`<div class="sonde-row" onclick="event.stopPropagation()"><input class="sonde-input" type="text" placeholder="N° sonde" value="${sondeNum}" oninput="saveSonde(this.value)"/><span style="font-size:12px;color:rgba(255,255,255,.4)">mm</span></div>`:""}
       </div>
     </div>`;
   });
@@ -465,27 +600,13 @@ function render(){
   c.innerHTML=h;
 }
 
-function selComp(drugKey, choice){
-  if(!window.compSel) window.compSel={};
-  // toggle: clicking same choice again deselects
-  if(window.compSel[drugKey]===choice){
-    window.compSel[drugKey]=null;
-    ck["comp_"+drugKey]=false;
-  } else {
-    window.compSel[drugKey]=choice;
-    ck["comp_"+drugKey]=true;
-  }
-  updP();renderTabs();render();
+function resetAll(){
+  if(!confirm("Réinitialiser toute la checklist ?"))return;
+  ck={};ds={induction_sed:null,induction_cur:null,relai_sed:null,relai_ant:null};
+  planSel={};triggerNotes={B:"",C:"",D:""};compSel={};sondeNum="";poids=0;
+  updP();renderTabs();render();pushState();
 }
 
-function resetAll(){
-  if(confirm("Réinitialiser toute la checklist ?")){
-    ck={};ds={induction_sed:null,induction_cur:null,relai_sed:null,relai_ant:null};
-    planSel={};triggerNotes={B:"",C:"",D:""};sondeNum="";poids=0;
-    window.compSel={};
-    updP();renderTabs();render();
-  }
-}
 renderTabs();render();updP();
 </script>
 </body>
