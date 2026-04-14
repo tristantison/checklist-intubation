@@ -27,6 +27,14 @@ body{background:#1a1a2e;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Tex
 .session-dot.off{background:#ef4444}
 .session-users{font-size:11px;color:rgba(255,255,255,0.5)}
 .sync-flash{animation:flash 0.4s ease}
+.timer-box{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:7px 11px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;flex-shrink:0}
+.timer-bar{background:rgba(255,255,255,0.03);border-bottom:1px solid rgba(255,255,255,0.06);padding:5px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.timer-display{font-size:17px;font-weight:800;letter-spacing:1.5px;font-variant-numeric:tabular-nums;color:rgba(255,255,255,0.7);transition:color 0.3s}
+.timer-display.running{color:#22c55e}
+.timer-display.stopped{color:#f9a825}
+.timer-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:rgba(255,255,255,0.35)}
+.timer-status{font-size:11px;color:rgba(255,255,255,0.4)}
+
 @keyframes flash{0%,100%{opacity:1}50%{opacity:0.3}}
 
 /* SESSION MODAL */
@@ -41,8 +49,8 @@ body{background:#1a1a2e;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Tex
 .modal-btn.danger{background:rgba(239,68,68,0.15);color:#ef4444;border:1px solid rgba(239,68,68,0.3)}
 .code-input{width:100%;background:rgba(0,0,0,0.3);border:2px solid rgba(255,255,255,0.15);border-radius:12px;padding:14px;font-size:28px;font-weight:800;color:#f9a825;text-align:center;letter-spacing:6px;outline:none;margin-bottom:12px;-webkit-appearance:none}
 .code-input:focus{border-color:#f9a825}
-.role-select{display:flex;gap:8px;margin-bottom:14px}
-.role-btn{flex:1;padding:10px 6px;border-radius:10px;border:1.5px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.6);font-size:12px;font-weight:600;cursor:pointer;text-align:center;transition:all 0.2s}
+.role-select{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+.role-btn{flex:1;min-width:calc(50% - 6px);padding:9px 4px;border-radius:10px;border:1.5px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.6);font-size:12px;font-weight:600;cursor:pointer;text-align:center;transition:all 0.2s}
 .role-btn.sel{border-color:#2563eb;background:rgba(37,99,235,0.15);color:#93c5fd}
 
 /* POIDS MODAL */
@@ -60,7 +68,7 @@ body{background:#1a1a2e;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Tex
 /* TABS */
 .tabs{display:flex;gap:5px;padding:6px 12px;overflow-x:auto;scrollbar-width:none;background:#1a1a2e;position:sticky;top:0;z-index:99}
 .tabs::-webkit-scrollbar{display:none}
-.tab{padding:7px 11px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap;border:none;transition:all 0.3s;display:flex;align-items:center;gap:3px;-webkit-tap-highlight-color:transparent}
+.tab{padding:8px 13px;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;border:none;transition:all 0.3s;display:flex;align-items:center;gap:3px;-webkit-tap-highlight-color:transparent}
 .cnt{padding:10px 12px 100px}
 .card{border-radius:16px;padding:14px;margin-bottom:10px}
 .stitle{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:12px}
@@ -74,6 +82,11 @@ body{background:#1a1a2e;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Tex
 .it.dn{text-decoration:line-through;opacity:0.4}
 .ok{background:rgba(34,197,94,0.15);border:1px solid rgba(34,197,94,0.3);border-radius:12px;padding:11px 14px;margin-bottom:10px;display:none;align-items:center;gap:10px}
 .ok.show{display:flex}
+.complete-overlay{position:fixed;inset:0;z-index:800;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(5,180,100,0.92);backdrop-filter:blur(8px);opacity:0;pointer-events:none;transition:opacity 0.6s}
+.complete-overlay.show{opacity:1;pointer-events:all}
+.complete-overlay h2{font-size:32px;font-weight:800;color:#fff;text-align:center;margin-bottom:10px;text-shadow:0 2px 12px rgba(0,0,0,0.2)}
+.complete-overlay p{font-size:16px;color:rgba(255,255,255,0.85);text-align:center;margin-bottom:30px}
+.complete-close{background:rgba(255,255,255,0.2);border:2px solid rgba(255,255,255,0.4);color:#fff;padding:14px 36px;border-radius:50px;font-size:16px;font-weight:700;cursor:pointer}
 .sonde-row{display:flex;align-items:center;gap:8px;margin-top:6px}
 .sonde-input{background:rgba(0,0,0,0.3);border:1.5px solid rgba(255,255,255,0.15);border-radius:8px;padding:5px 10px;font-size:13px;color:#fff;width:80px;outline:none;text-align:center;-webkit-appearance:none}
 .sonde-input::placeholder{color:rgba(255,255,255,0.25);font-size:11px}
@@ -126,7 +139,7 @@ body{background:#1a1a2e;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Tex
 @media(orientation:landscape){
   .hdr{padding:4px 12px 4px}
   .tabs{padding:4px 12px}
-  .tab{padding:5px 10px;font-size:10px}
+  .tab{padding:6px 11px;font-size:12px}
   .cnt{padding:6px 12px 50px}
   .poids-box-val{font-size:15px}
 }
@@ -141,9 +154,15 @@ body{background:#1a1a2e;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Tex
       <h1>Check list d'intubation hors AC</h1>
       <p id="pl">0 / 0 éléments validés</p>
     </div>
-    <div class="poids-box" onclick="openPoids()">
-      <div><div class="poids-box-lbl">POIDS</div><div class="poids-box-val" id="poids-display">—</div></div>
-      <div><div class="poids-box-lbl">kg</div><div class="poids-box-mic" id="hdr-mic">🎤</div></div>
+    <div style="display:flex;align-items:center;gap:7px">
+      <div class="poids-box" onclick="openPoids()">
+        <div><div class="poids-box-lbl">POIDS</div><div class="poids-box-val" id="poids-display">—</div></div>
+        <div><div class="poids-box-lbl">kg</div><div class="poids-box-mic" id="hdr-mic">🎙</div></div>
+      </div>
+      <div class="timer-box" id="timer-bar">
+        <div class="poids-box-lbl">DURÉE</div>
+        <div class="timer-display" id="timer-display">00:00</div>
+      </div>
     </div>
   </div>
   <div class="pbar"><div class="pfill" id="pf" style="width:0%"></div></div>
@@ -169,9 +188,10 @@ body{background:#1a1a2e;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Tex
     <div id="role-section" style="margin-bottom:4px">
       <div style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:8px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px">Votre rôle</div>
       <div class="role-select">
-        <div class="role-btn sel" id="role-med" onclick="setRole('Médecin')">👨‍⚕️ Médecin</div>
+        <div class="role-btn sel" id="role-doc" onclick="setRole('DOC')">🔦 DOC</div>
         <div class="role-btn" id="role-ide" onclick="setRole('IDE')">💉 IDE</div>
-        <div class="role-btn" id="role-amb" onclick="setRole('Conducteur')">🚑 Conducteur</div>
+        <div class="role-btn" id="role-ade" onclick="setRole('ADE')">🚑 ADE</div>
+        <div class="role-btn" id="role-jr" onclick="setRole('JR')">🐣 JR</div>
       </div>
     </div>
     <button class="modal-btn primary" onclick="createSession()">➕ Créer une session</button>
@@ -193,13 +213,20 @@ body{background:#1a1a2e;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Tex
     <div class="poids-modal-row">
       <input class="pv" type="number" inputmode="decimal" min="1" max="200" placeholder="— kg" id="poids-input" oninput="setPoids(parseFloat(this.value)||0)"/>
       <span style="color:rgba(255,255,255,.5);font-size:16px;font-weight:600">kg</span>
-      <button class="mic-btn" id="poids-mic" onclick="toggleListen()">🎤</button>
+      <button class="mic-btn" id="poids-mic" onclick="toggleListen()">🎙</button>
     </div>
     <div style="font-size:12px;color:rgba(255,255,255,.35);margin-bottom:10px">Saisir ou dicter le poids</div>
     <button class="poids-close" onclick="closePoids()">Valider</button>
   </div>
 </div>
 
+<div class="complete-overlay" id="complete-overlay">
+  <div style="font-size:72px;margin-bottom:16px">✅</div>
+  <h2>Check list complète !</h2>
+  <p>Tous les éléments ont été validés.<br>L'équipe est prête.</p>
+  <p id="overlay-time" style="font-size:28px;font-weight:800;color:#fff;letter-spacing:2px;margin-bottom:8px"></p>
+  <button class="complete-close" onclick="document.getElementById('complete-overlay').classList.remove('show')">Continuer</button>
+</div>
 <div class="tabs" id="tb"></div>
 <div class="cnt" id="mc"></div>
 <button class="reset-btn" onclick="resetAll()">🔄 Réinit.</button>
@@ -297,8 +324,11 @@ let compSel={};
 let sondeNum="", poids=0, act=0;
 let recognition=null, listening=false;
 
+// ── TIMER ──
+let timerStart=null, timerInterval=null, timerFinal=null;
+
 // ── SESSION ──
-let sessionCode=null, userRole="Médecin", dbRef=null, dbListener=null;
+let sessionCode=null, userRole="DOC", dbRef=null, dbListener=null;
 let isSyncing=false; // prevent feedback loop
 
 function genCode(){return Math.floor(1000+Math.random()*9000).toString();}
@@ -306,7 +336,7 @@ function genCode(){return Math.floor(1000+Math.random()*9000).toString();}
 function setRole(r){
   userRole=r;
   ["med","ide","amb"].forEach(id=>document.getElementById("role-"+id).classList.remove("sel"));
-  const map={Médecin:"med",IDE:"ide",Conducteur:"amb"};
+  const map={DOC:"doc",IDE:"ide",ADE:"ade",JR:"jr"};
   document.getElementById("role-"+map[r]).classList.add("sel");
 }
 
@@ -414,12 +444,59 @@ function keys(s){
   return s.items.map((_,i)=>s.id+"_"+i);
 }
 function isDone(s){const k=keys(s);return k.length>0&&k.every(x=>ck[x]);}
+
+function timerFmt(ms){
+  const s=Math.floor(ms/1000), m=Math.floor(s/60);
+  return String(m).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
+}
+function timerTick(){
+  const el=document.getElementById('timer-display');
+  if(el) el.textContent=timerFmt(Date.now()-timerStart);
+}
+function timerCheckStart(){
+  if(timerStart!==null) return; // already running
+  const anyChecked=Object.values(ck).some(Boolean);
+  if(!anyChecked) return;
+  timerStart=Date.now();
+  timerFinal=null;
+  const el=document.getElementById('timer-display');
+  if(el) el.className='timer-display running';
+  const st=document.getElementById('timer-status');
+  if(st) st.textContent='En cours…';
+  timerInterval=setInterval(timerTick,500);
+}
+function timerStop(totalMs){
+  if(timerInterval){clearInterval(timerInterval);timerInterval=null;}
+  timerFinal=totalMs;
+  const el=document.getElementById('timer-display');
+  if(el){el.textContent=timerFmt(totalMs);el.className='timer-display stopped';}
+  const st=document.getElementById('timer-status');
+  if(st) st.textContent='Checklist terminée ✓';
+}
+function timerReset(){
+  if(timerInterval){clearInterval(timerInterval);timerInterval=null;}
+  timerStart=null;timerFinal=null;
+  const el=document.getElementById('timer-display');
+  if(el){el.textContent='00:00';el.className='timer-display';}
+  const st=document.getElementById('timer-status');
+  if(st) st.textContent='En attente de la 1ère case…';
+}
+
 function updP(){
   const tot=S.reduce((a,s)=>a+keys(s).length,0),d=Object.values(ck).filter(Boolean).length,p=tot?Math.round(d/tot*100):0;
   document.getElementById("pl").textContent=d+" / "+tot+" éléments validés";
   const f=document.getElementById("pf");f.style.width=p+"%";
   f.style.background=p===100?"#22c55e":p>60?"#f59e0b":"#3b82f6";
   document.getElementById("poids-display").textContent=poids>0?poids:"—";
+  timerCheckStart();
+  if(p===100){
+    if(timerStart!==null&&timerFinal===null) timerStop(Date.now()-timerStart);
+    setTimeout(()=>{
+      const ov=document.getElementById("complete-overlay");
+      const ot=document.getElementById("overlay-time");if(ot&&timerFinal!==null)ot.textContent=timerFmt(timerFinal);
+      if(ov&&!ov.classList.contains("show"))ov.classList.add("show");
+    },400);
+  }
 }
 function renderTabs(){
   document.getElementById("tb").innerHTML=S.map((s,i)=>{
@@ -442,7 +519,8 @@ function saveSonde(val){sondeNum=val;pushState();}
 function selComp(drugKey,choice){
   if(compSel[drugKey]===choice){compSel[drugKey]=null;ck["comp_"+drugKey]=false;}
   else{compSel[drugKey]=choice;ck["comp_"+drugKey]=true;}
-  updP();renderTabs();render();pushState();
+  timerReset();updP();renderTabs();render();pushState();
+  document.getElementById("complete-overlay").classList.remove("show");
 }
 
 // ── POIDS ──
@@ -477,12 +555,12 @@ function startListen(){
   if(!recognition){alert("Reconnaissance vocale non disponible.");return;}
   listening=true;recognition.start();
   document.getElementById("poids-mic").classList.add("listening");
-  document.getElementById("hdr-mic").textContent="🔴";
+  document.getElementById("hdr-mic").textContent="⏺";
 }
 function stopListen(){
   listening=false;if(recognition)try{recognition.stop();}catch(e){}
   const m=document.getElementById("poids-mic");if(m)m.classList.remove("listening");
-  document.getElementById("hdr-mic").textContent="🎤";
+  document.getElementById("hdr-mic").textContent="🎙";
 }
 
 // ── CALC ──
