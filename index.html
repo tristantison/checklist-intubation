@@ -243,8 +243,6 @@ body{background:#1a1a2e;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Tex
 <button class="reset-btn" onclick="resetAll()">🔄 Réinit.</button>
 
 
-<!-- EMAILJS -->
-<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 <!-- FIREBASE -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -524,7 +522,7 @@ function updP(){
   timerCheckStart();
   if(p===100){
     if(timerStart!==null&&timerFinal===null) timerStop(Date.now()-timerStart);
-    autoSendRapport();
+    try{autoSendRapport();}catch(e){console.warn("EmailJS error:",e);}
     setTimeout(()=>{
       const ov=document.getElementById("complete-overlay");
       const ot=document.getElementById("overlay-time");if(ot&&timerFinal!==null)ot.textContent=timerFmt(timerFinal);
@@ -771,7 +769,8 @@ function buildRapportText(){
 }
 
 function autoSendRapport(){
-  if(rapportSent) return; // n'envoyer qu'une seule fois par checklist
+  if(typeof emailjs==='undefined'){console.warn("EmailJS non chargé");return;}
+  if(rapportSent) return;
   rapportSent=true;
   const duree=timerFinal?timerFmt(timerFinal):'—';
   const rapport=buildRapportText();
@@ -857,5 +856,6 @@ function resetAll(){
 
 renderTabs();render();updP();
 </script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 </body>
 </html>
