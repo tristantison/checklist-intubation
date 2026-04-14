@@ -228,16 +228,6 @@ body{background:#1a1a2e;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Tex
   <p style="font-size:13px;color:rgba(255,255,255,0.6);margin-top:-20px" id="overlay-countdown"></p>
 </div>
 
-<!-- RAPPORT MODAL -->
-<div class="modal-bg hidden" id="rapport-modal">
-  <div class="modal" style="max-height:85vh;overflow-y:auto">
-    <h2 style="margin-bottom:12px">📋 Rapport de checklist</h2>
-    <div id="rapport-content" style="font-size:13px;color:rgba(255,255,255,0.8);line-height:1.7;margin-bottom:16px"></div>
-    <input type="email" id="rapport-email" placeholder="adresse@email.com" style="width:100%;background:rgba(0,0,0,0.3);border:1.5px solid rgba(255,255,255,0.15);border-radius:10px;padding:11px;font-size:14px;color:#fff;outline:none;margin-bottom:10px"/>
-    <button class="modal-btn primary" onclick="sendRapport()">📨 Envoyer par email</button>
-    <button class="modal-btn secondary" onclick="document.getElementById('rapport-modal').classList.add('hidden')">Fermer</button>
-  </div>
-</div>
 <div class="tabs" id="tb"></div>
 <div class="cnt" id="mc"></div>
 <button class="reset-btn" onclick="resetAll()">🔄 Réinit.</button>
@@ -257,11 +247,6 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-// ── EMAILJS ──
-const EMAILJS_SERVICE = "service_5nynxdb";
-const EMAILJS_TEMPLATE = "template_eydo2hf";
-let rapportSent = false;
-let emailjsReady = false;
 
 // ── DATA ──
 const S=[
@@ -521,7 +506,6 @@ function updP(){
   timerCheckStart();
   if(p===100){
     if(timerStart!==null&&timerFinal===null) timerStop(Date.now()-timerStart);
-    try{autoSendRapport();}catch(e){console.warn("EmailJS error:",e);}
     setTimeout(()=>{
       const ov=document.getElementById("complete-overlay");
       const ot=document.getElementById("overlay-time");if(ot&&timerFinal!==null)ot.textContent=timerFmt(timerFinal);
@@ -720,73 +704,6 @@ function render(){
 
 
 
-function buildRapportText(){
-  const now=new Date();
-  let r='';
-  r+='Date : '+now.toLocaleDateString('fr-FR')+' '+now.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})+'\n';
-  r+='Durée checklist : '+(timerFinal?timerFmt(timerFinal):'—')+'\n';
-  r+='Poids patient : '+(poids?poids+' kg':'Non renseigné')+'\n\n';
-  r+='PLAN AIRWAY RETENU :\n';
-  ['A','B','C','D'].forEach(id=>{
-    if(ck['plan_'+id]){
-      const p=PLANS.find(x=>x.id===id);
-      let sel='';
-      if(planSel[id]){const o=p.opts.find(x=>x.id===planSel[id]);if(o)sel=' → '+o.label;}
-      r+='• Plan '+id+' : '+p.sub+sel+'\n';
-    }
-  });
-  r+='\nDROGUES INDUCTION :\n';
-  [{key:'induction_sed',label:'Sédatif'},{key:'induction_cur',label:'Curare'}].forEach(g=>{
-    if(ds[g.key]){
-      const grp=DG.find(x=>x.key===g.key);
-      const opt=grp.opts.find(x=>x.id===ds[g.key]);
-      let dose='';
-      if(opt&&poids){const r2=opt.calc(poids);dose=' — '+(r2.s?r2.v+' '+r2.u:r2.lo+'–'+r2.hi+' '+r2.u);}
-      r+='• '+g.label+' : '+opt.name+dose+'\n';
-    }
-  });
-  r+='\nDROGUES RELAIS :\n';
-  [{key:'relai_sed',label:'Sédatif'},{key:'relai_ant',label:'Antalgique'}].forEach(g=>{
-    if(ds[g.key]){
-      const grp=DG.find(x=>x.key===g.key);
-      const opt=grp.opts.find(x=>x.id===ds[g.key]);
-      let dose='';
-      if(opt&&poids){const r2=opt.calc(poids);dose=' — '+(r2.s?r2.v+' '+r2.u:r2.lo+'–'+r2.hi+' '+r2.u);}
-      r+='• '+g.label+' : '+opt.name+dose+'\n';
-    }
-  });
-  r+='\nDROGUES COMPLEMENTAIRES :\n';
-  COMP.forEach(c=>{
-    const sel=compSel[c.k];
-    if(sel) r+='• '+c.label+' : '+(sel==='dispo'?'Disponible':'Préparée')+'\n';
-  });
-  if(sondeNum) r+='\nN° sonde IOT : '+sondeNum+' mm\n';
-  if(sessionCode) r+='\nSession : '+sessionCode+'\n';
-  r+='\nRôles présents : '+(sessionCode?'session active':'solo')+'\n';
-  return r;
-}
-
-function autoSendRapport(){
-  try{
-  if(typeof emailjs==='undefined'){console.warn("EmailJS non chargé");return;}
-  if(!emailjsReady){emailjs.init("IurJgJQ9cPAp8m4gy");emailjsReady=true;}
-  if(rapportSent) return;
-  rapportSent=true;
-  const duree=timerFinal?timerFmt(timerFinal):'—';
-  const rapport=buildRapportText();
-  emailjs.send(EMAILJS_SERVICE, EMAILJS_TEMPLATE, {
-    duree: duree,
-    rapport: rapport,
-    poids: poids?poids+' kg':'—',
-    session: sessionCode||'solo',
-  }).then(()=>{
-    console.log('Rapport envoyé automatiquement');
-  }).catch(err=>{
-    console.warn('Erreur envoi rapport:', err);
-  });
-  }catch(e){console.warn('EmailJS fatal:',e);}
-}
-
 function buildRapport(){
   const now=new Date();
   const dateStr=now.toLocaleDateString('fr-FR')+' à '+now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
@@ -833,30 +750,14 @@ function buildRapport(){
   return r;
 }
 
-function openRapport(){
-  const content=buildRapport();
-  document.getElementById('rapport-content').innerHTML=content;
-  document.getElementById('rapport-modal').classList.remove('hidden');
-}
-
-function sendRapport(){
-  const email=document.getElementById('rapport-email').value.trim();
-  if(!email){alert('Entrez une adresse email');return;}
-  const plain=document.getElementById('rapport-content').innerText;
-  const subject=encodeURIComponent('Rapport checklist intubation SMUR — '+(timerFinal?timerFmt(timerFinal):''));
-  const body=encodeURIComponent(plain);
-  window.location.href='mailto:'+email+'?subject='+subject+'&body='+body;
-}
-
 function resetAll(){
   if(!confirm("Réinitialiser toute la checklist ?"))return;
   ck={};ds={induction_sed:null,induction_cur:null,relai_sed:null,relai_ant:null};
-  planSel={};triggerNotes={B:"",C:"",D:""};compSel={};sondeNum="";poids=0;rapportSent=false;
+  planSel={};triggerNotes={B:"",C:"",D:""};compSel={};sondeNum="";poids=0;
   timerReset();updP();renderTabs();render();pushState();
 }
 
 renderTabs();render();updP();
 </script>
-<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 </body>
 </html>
