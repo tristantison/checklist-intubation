@@ -258,11 +258,10 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
 // ── EMAILJS ──
-emailjs.init("IurJgJQ9cPAp8m4gy");
 const EMAILJS_SERVICE = "service_5nynxdb";
 const EMAILJS_TEMPLATE = "template_eydo2hf";
-const MONITORING_EMAIL = ""; // laisser vide = destinataire défini dans le template
 let rapportSent = false;
+let emailjsReady = false;
 
 // ── DATA ──
 const S=[
@@ -561,8 +560,7 @@ function saveSonde(val){sondeNum=val;pushState();}
 function selComp(drugKey,choice){
   if(compSel[drugKey]===choice){compSel[drugKey]=null;ck["comp_"+drugKey]=false;}
   else{compSel[drugKey]=choice;ck["comp_"+drugKey]=true;}
-  timerReset();updP();renderTabs();render();pushState();
-  document.getElementById("complete-overlay").classList.remove("show");
+  updP();renderTabs();render();pushState();
 }
 
 // ── POIDS ──
@@ -769,7 +767,9 @@ function buildRapportText(){
 }
 
 function autoSendRapport(){
+  try{
   if(typeof emailjs==='undefined'){console.warn("EmailJS non chargé");return;}
+  if(!emailjsReady){emailjs.init("IurJgJQ9cPAp8m4gy");emailjsReady=true;}
   if(rapportSent) return;
   rapportSent=true;
   const duree=timerFinal?timerFmt(timerFinal):'—';
@@ -784,6 +784,7 @@ function autoSendRapport(){
   }).catch(err=>{
     console.warn('Erreur envoi rapport:', err);
   });
+  }catch(e){console.warn('EmailJS fatal:',e);}
 }
 
 function buildRapport(){
@@ -851,7 +852,7 @@ function resetAll(){
   if(!confirm("Réinitialiser toute la checklist ?"))return;
   ck={};ds={induction_sed:null,induction_cur:null,relai_sed:null,relai_ant:null};
   planSel={};triggerNotes={B:"",C:"",D:""};compSel={};sondeNum="";poids=0;rapportSent=false;
-  updP();renderTabs();render();pushState();
+  timerReset();updP();renderTabs();render();pushState();
 }
 
 renderTabs();render();updP();
