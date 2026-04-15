@@ -417,6 +417,7 @@ function getFullState(){
   return{ck,ds,planSel,triggerNotes,compSel,sondeNum,poids,timerStart,timerFinal};
 }
 
+let isApplyingState=false;
 function applyState(st){
   if(st.ck) ck=st.ck;
   if(st.ds) ds=st.ds;
@@ -436,7 +437,7 @@ function applyState(st){
   if(st.timerFinal!==undefined && st.timerFinal!==null && timerFinal===null){
     timerStop(st.timerFinal);
   }
-  updP();renderTabs();render();
+  isApplyingState=true;updP();renderTabs();render();isApplyingState=false;
 }
 
 function flashSync(){
@@ -506,7 +507,7 @@ function updP(){
   timerCheckStart();
   if(p===100){
     if(timerStart!==null&&timerFinal===null) timerStop(Date.now()-timerStart);
-    setTimeout(()=>{
+    if(!isApplyingState) setTimeout(()=>{
       const ov=document.getElementById("complete-overlay");
       const ot=document.getElementById("overlay-time");if(ot&&timerFinal!==null)ot.textContent=timerFmt(timerFinal);
       if(ov&&!ov.classList.contains("show")){
@@ -521,6 +522,7 @@ function updP(){
         },1000);
       }
     },400);
+    else updP();
   }
 }
 function renderTabs(){
@@ -757,6 +759,7 @@ function resetAll(){
   timerReset();updP();renderTabs();render();pushState();
 }
 
+document.getElementById("complete-overlay").classList.remove("show");
 renderTabs();render();updP();
 </script>
 </body>
